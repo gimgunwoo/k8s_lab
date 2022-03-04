@@ -1,0 +1,123 @@
+---
+
+- hosts: all
+  become: true
+  tasks:
+    - name: disable swap
+      shell: |
+        swapoff -a
+
+    - name: comment swap in /etc/fstab
+      replace:
+        path: /etc/fstab
+        regexp: '^([^#].*?\sswap\s+sw\s+.*)$'
+        replace: '# \1'
+
+    - name: install packages
+      apt:
+        name:
+          - curl
+          - apt-transport-https
+          - ca-certificates
+          - gnupg
+          - lsb-release
+        state: present
+
+    - name: add docker gpg key
+      shell: >
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+    
+    - name: add docker repository
+      apt_repository:
+        repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu focal stable"
+        filename: docker
+        state: present
+        update_cache: true
+
+    - name: add kubernetes gpg key
+      shell: >
+        curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+
+    - name: add kubernetes repository
+      apt_repository:
+        repo: "deb https://apt.kubernetes.io/ kubernetes-xenial main"
+        filename: kubernetes
+        state: present
+        update_cache: true
+
+    - name: install docker and kubernetes
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-compose
+          - kubelet=1.22.0-00
+          - kubeadm=1.22.0-00
+          - kubectl=1.22.0-00
+
+    - name: hold kubernetes' version
+      dpkg_selections:
+        name: "{{ item }}"
+        selection: hold
+      with_items:
+        - kubelet
+        - kubeadm
+        - kubectl
+
+    - name: update kernel setting for CNI
+      sysctl:
+        name: net.bridge.bridge-nf-call-iptables
+        value: 1
+        sysctl_set: yes
+        state: present
+        reload: yes
+
+    - name: Change cgroup driver
+      copy:
+        src: ../files/daemon.json
+        dest: /etc/docker/daemon.json
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Reload systemd config
+      systemd:
+        daemon_reload: yes
+
+    - name: Restart docker service
+      systemd:
+        state: restarted
+        name: docker
+
+    - name: Reboot the machine
+      reboot:
+
+    - name: kubeadm init
+      command: kubeadm init --pod-network-cidr="10.244.0.0/16" --service-cidr="10.96.0.0/12" --apiserver-advertise-address="10.0.100.11"
+
+    - name: Make .kube dir
+      file:
+        path: /root/.kube
+        state: directory
+
+    - name: Copy kube config
+      copy:
+        src: /etc/kubernetes/admin.conf
+        dest: /root/.kube/config
+        mode: u+r,g+r
+        remote_src: yes
+
+    - name: Install Calico
+      command: kubectl apply -f https://projectcalico.docs.tigera.io/manifests/calico.yaml
+
+    - name: Register join token
+      command: kubeadm token create --print-join-command
+      register: join_command
+
+    - name: Save kubeadm join command
+      become: 
+      local_action:
+        module: copy
+        content: "{{ join_command.stdout }}"
+        dest: ../join_command.sh
