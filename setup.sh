@@ -1,10 +1,12 @@
 #!/bin/bash
 
+# install git
+sudo apt update -y && sudo apt install git -y
+
 # clone kiamol repo
 git clone https://github.com/sixeyed/kiamol.git ../kiamol
 
 # install ansible
-sudo apt update -y
 sudo apt install software-properties-common wget
 sudo add-apt-repository --yes --update ppa:ansible/ansible
 sudo apt install ansible -y
@@ -24,3 +26,6 @@ sudo apt install gcc-12 -y
 
 # run vboxconfig
 sudo /sbin/vboxconfig
+
+# allow 10.0.0.0/8 CIDR
+echo "* 10.0.0.0/8" | sudo tee -a /etc/vbox/networks.conf
