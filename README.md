@@ -3,7 +3,7 @@
 A k8s lab in a laptop based on [Learn Kubernetes in a Month of Lunches](https://kiamol.net/)([Its repo](https://github.com/sixeyed/kiamol.git )). This lab helps build a k8s cluster with 1 controller and 3 worker nodes.
 
 
-Requirement:
+My environment:
 * Ubuntu 22.04
 * A laptop or a desktop computer with 4 core CPUs(8 threads) and 16GB RAM
 
@@ -21,3 +21,4 @@ kubectl get nodes
 ## Notes
 * This is just a lab, so `root` in controller has admin config file. This **should** not be accepted in production environment.
 * The playbook installs k8s 1.29 so that I can learn k8s upgrade.
+* There are more upcoming updates since the first commit was 2 years ago.
