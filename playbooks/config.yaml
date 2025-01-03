@@ -4,7 +4,7 @@
   become: true
   tasks:
     - name: Install container runtime and k8s tools
-      include: container_runtime_k8s_tools.yaml
+      include_tasks: container_runtime_k8s_tools.yaml
 
     - name: Join k8s cluster
       script: ../join_command.sh
