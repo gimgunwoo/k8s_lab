@@ -93,9 +93,13 @@
 - name: Apply sysctl params without reboot
   shell: sysctl --system
 
-#- name: Change cgroup driver
-#  shell: >
-#    kubeadm init --config ../files/kubeadm-config.yaml
+- name: configuring cgroup driver
+  copy:
+    src: ../files/config.toml
+    dest: /etc/containerd/config.toml
+    owner: root
+    group: root
+    mode: '0644'
 
 - name: Reload systemd config
   systemd:
