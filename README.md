@@ -10,10 +10,11 @@ My environment:
 ## How to create a cluster
 
 1. Run `setup.sh` to clone KIAMOL repo, install ansible, virtualbox and vagrant. This will take some time
-2. Go to controller01 directory and run `vagrant up` to start a controller machine.
-3. Go to worker[01:03] directories and run `vagrant up` to start worker node machines.
-4. Once provision by ansible playbook is done, k8s cluster is built.
-5. Verify the cluster in the controller machine as root
+2. Go to nfs01 directory and run `vagrant up` to start a NFS server
+3. Go to controller01 directory and run `vagrant up` to start a controller machine.
+4. Go to worker[01:03] directories and run `vagrant up` to start worker node machines.
+5. Once provision by ansible playbook is done, k8s cluster is built.
+6. Verify the cluster in the controller machine as root
 ```
 kubectl get nodes
 ```
@@ -21,4 +22,4 @@ kubectl get nodes
 ## Notes
 * This is just a lab, so `root` in controller has admin config file. This **should** not be accepted in production environment.
 * The playbook installs k8s 1.29 so that I can learn k8s upgrade.
-* There are more upcoming updates since the first commit was 2 years ago.
+* There is a work in progress to learn NFS storage provisioner
