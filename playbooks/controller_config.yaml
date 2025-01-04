@@ -6,6 +6,19 @@
     - name: Install container runtime and k8s tools
       include_tasks: container_runtime_k8s_tools.yaml
 
+    - name: Create NFS mount point
+      file:
+        path: /var/nfsshare
+        state: directory
+
+    - name: Mount NFS share
+      mount:
+        src: 10.0.100.15:/nfsexport
+        path: /var/nfsshare
+        opts: defaults
+        state: mounted
+        fstype: nfs
+
     - name: kubeadm init
       command: kubeadm init --pod-network-cidr="10.244.0.0/16" --service-cidr="10.96.0.0/12" --apiserver-advertise-address="10.0.100.11"
 

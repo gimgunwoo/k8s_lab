@@ -18,6 +18,7 @@
       - ca-certificates
       - gnupg
       - lsb-release
+      - nfs-common
     state: present
 
 - name: add docker gpg key

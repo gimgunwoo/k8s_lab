@@ -1,0 +1,24 @@
+---
+
+- hosts: all
+  become: true
+  tasks:
+    - name: Install NFS server
+      apt:
+        name: nfs-server
+        update_cache: yes
+
+    - name: Create NFS directory
+      file:
+        path: /nfsexport
+        state: directory
+
+    - name: Configure NFS
+      lineinfile:
+        path: /etc/exports
+        line: '/nfsexport *(rw,no_root_squash)'
+
+    - name: Restart NFS server
+      systemd_service:
+        name: nfs-server
+        state: restarted
