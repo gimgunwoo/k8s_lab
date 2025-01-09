@@ -6,6 +6,7 @@ A k8s lab in a laptop based on [Learn Kubernetes in a Month of Lunches](https://
 My environment:
 * Ubuntu 22.04
 * A laptop or a desktop computer with 4 core CPUs(8 threads) and 16GB RAM
+    * My laptop is T440p, i7-4702MQ and 16G RAM
 
 ## How to create a cluster
 
